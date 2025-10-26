@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Timothy Benjamin | Official Website of Sheba Ashley</title>
+  <meta name="description" content="Official website of the YouTube channel Sheba Ashley, led by Timothy Benjamin Ashley.">
+  <style>
+    :root{
+      --light-blue:#a8d0ff;--dark-purple:#1a0033;--accent:#7c5cff;--radius:14px;--ff:system-ui,-apple-system,'Segoe UI',Roboto;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--ff);background:linear-gradient(180deg,var(--light-blue),var(--dark-purple));color:#fff;min-height:100vh;}
+    header,footer{background:rgba(0,0,0,0.2);padding:1rem;text-align:center}
+    h1,h2,h3{text-align:center}
+    main{max-width:1000px;margin:0 auto;padding:2rem}
+    section{margin:2rem 0;padding:1rem;background:rgba(255,255,255,0.1);border-radius:var(--radius)}
+    a{color:#ffecb3;text-decoration:none}
+    button{background:var(--accent);color:#fff;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer}
+    canvas{background:#000;display:block;margin:1rem auto;border-radius:8px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Timothy Benjamin | Official Website of Sheba Ashley</h1>
+    <p>Welcome to our world of creativity and fun!</p>
+  </header>
+
+  <main>
+    <section id="about">
+      <h2>About Me</h2>
+      <p>We are a YouTube channel run by <strong>Timothy Benjamin Ashley</strong>, the main head of the channel. Our videos are creative, entertaining, and full of personality — check them out on <a href="https://www.youtube.com/@shebaashley7520" target="_blank">@shebaashley7520</a>.</p>
+    </section>
+
+    <section id="games">
+      <h2>Games</h2>
+      <p>Enjoy a few fun browser games right here!</p>
+
+      <h3>Tic Tac Toe (vs AI)</h3>
+      <div style="text-align:center">
+        <div id="board" style="display:grid;grid-template-columns:repeat(3,80px);gap:8px;justify-content:center;margin:1rem auto"></div>
+        <p id="status"></p>
+        <button onclick="resetBoard()">Restart</button>
+      </div>
+
+      <h3>Flappy Bird Mini</h3>
+      <canvas id="flappy" width="300" height="400"></canvas>
+
+      <h3>Memory Match</h3>
+      <div id="memory-game" style="display:grid;grid-template-columns:repeat(4,60px);gap:10px;justify-content:center"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Timothy Benjamin | Official Website of Sheba Ashley</p>
+  </footer>
+
+  <script>
+    // ---------- Tic Tac Toe with simple AI ----------
+    const boardDiv=document.getElementById('board');
+    const status=document.getElementById('status');
+    let board=['','','','','','','','',''];
+    const human='X', ai='O';
+
+    function renderBoard(){
+      boardDiv.innerHTML='';
+      board.forEach((v,i)=>{
+        const cell=document.createElement('button');
+        cell.textContent=v;
+        cell.style.width='80px';cell.style.height='80px';cell.style.fontSize='2rem';
+        cell.onclick=()=>makeMove(i);
+        boardDiv.appendChild(cell);
+      });
+    }
+    function checkWinner(b){
+      const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      for(const [a,b1,c] of wins){if(b[a]&&b[a]===b[b1]&&b[a]===b[c])return b[a];}
+      return b.includes('')?null:'tie';
+    }
+    function aiMove(){
+      const empty=board.map((v,i)=>v===''?i:null).filter(v=>v!==null);
+      const choice=empty[Math.floor(Math.random()*empty.length)];
+      board[choice]=ai;renderBoard();
+      const win=checkWinner(board);
+      if(win){status.textContent=win==='tie'?'It\'s a tie!':win+' wins!';}
+    }
+    function makeMove(i){
+      if(board[i]||checkWinner(board))return;
+      board[i]=human;renderBoard();
+      const win=checkWinner(board);
+      if(win){status.textContent=win==='tie'?'It\'s a tie!':win+' wins!';return;}
+      setTimeout(aiMove,400);
+    }
+    function resetBoard(){board=['','','','','','','','',''];status.textContent='';renderBoard();}
+    renderBoard();
+
+    // ---------- Flappy Bird Mini ----------
+    const canvas=document.getElementById('flappy');
+    const ctx=canvas.getContext('2d');
+    let birdY=200, velocity=0, gravity=0.6, pipes=[], score=0;
+    document.addEventListener('keydown',()=>velocity=-8);
+    function resetFlappy(){birdY=200;velocity=0;pipes=[];score=0;}
+    function drawFlappy(){
+      ctx.fillStyle='#000';ctx.fillRect(0,0,300,400);
+      velocity+=gravity;birdY+=velocity;
+      if(birdY>380||birdY<0)resetFlappy();
+      if(Math.random()<0.02)pipes.push({x:300,y:Math.random()*200+100});
+      pipes.forEach(p=>p.x-=2);
+      pipes=pipes.filter(p=>p.x>-30);
+      ctx.fillStyle='lime';ctx.fillRect(50,birdY,20,20);
+      ctx.fillStyle='red';
+      pipes.forEach(p=>{
+        ctx.fillRect(p.x,0,30,p.y-60);
+        ctx.fillRect(p.x,p.y+60,30,400);
+        if(50<p.x+30&&70>p.x&&(birdY<p.y-60||birdY+20>p.y+60))resetFlappy();
+      });
+      requestAnimationFrame(drawFlappy);
+    }
+    drawFlappy();
+
+    // ---------- Memory Match ----------
+    const mem=document.getElementById('memory-game');
+    const symbols=['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼'];
+    let cards=[...symbols,...symbols].sort(()=>Math.random()-0.5);
+    let flipped=[],matched=[];
+    cards.forEach((s,i)=>{
+      const c=document.createElement('button');
+      c.textContent='❓';
+      c.style.fontSize='1.5rem';c.style.width='60px';c.style.height='60px';
+      c.onclick=()=>flip(i,c);
+      mem.appendChild(c);
+    });
+    function flip(i,c){
+      if(matched.includes(i)||flipped.includes(i))return;
+      c.textContent=cards[i];flipped.push(i);
+      if(flipped.length===2){
+        const [a,b]=flipped;
+        if(cards[a]===cards[b])matched.push(a,b);
+        else setTimeout(()=>{mem.children[a].textContent='❓';mem.children[b].textContent='❓';},800);
+        flipped=[];
+      }
+      if(matched.length===cards.length)alert('You matched them all!');
+    }
+  </script>
+</body>
+</html>
